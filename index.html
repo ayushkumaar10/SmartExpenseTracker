@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Expense Tracker</title>
+  <style>
+    /* style.css - embedded for single file */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f6f9fc 0%, #e9f1f8 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .app-container {
+      max-width: 1200px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 3rem;
+      box-shadow: 0 20px 40px rgba(0, 20, 30, 0.15), 0 8px 20px rgba(0, 0, 0, 0.05);
+      padding: 2rem 2rem 2rem 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #0b2b3b, #1b5e7a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo span {
+      font-size: 2.2rem;
+      background: none;
+      -webkit-text-fill-color: #1e7e5c;
+    }
+
+    .balance-badge {
+      background: #ffffffdd;
+      backdrop-filter: blur(8px);
+      padding: 0.8rem 1.8rem;
+      border-radius: 60px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      border: 1px solid #ffffff;
+    }
+
+    .balance-badge .label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #4a627a;
+      font-weight: 500;
+    }
+
+    .balance-badge .amount {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #1b3b4f;
+      line-height: 1.2;
+    }
+
+    .balance-badge .amount.positive {
+      color: #0e6b4b;
+    }
+
+    .balance-badge .amount.negative {
+      color: #b13e3e;
+    }
+
+    /* Summary Cards */
+    .summary-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2.2rem;
+    }
+
+    .card {
+      background: #ffffffdd;
+      backdrop-filter: blur(8px);
+      padding: 1.5rem 1.8rem;
+      border-radius: 2rem;
+      border: 1px solid #ffffff;
+      box-shadow: 0 6px 14px rgba(0, 20, 30, 0.03);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+    }
+
+    .card .info h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #4d6a82;
+      margin-bottom: 0.4rem;
+    }
+
+    .card .info .value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1d3b4b;
+    }
+
+    .card .icon {
+      font-size: 2.4rem;
+      opacity: 0.7;
+    }
+
+    .income-card .value {
+      color: #0e6b4b;
+    }
+
+    .expense-card .value {
+      color: #b13e3e;
+    }
+
+    /* Form Section */
+    .form-section {
+      background: #ffffffcc;
+      backdrop-filter: blur(8px);
+      border-radius: 2.5rem;
+      padding: 1.8rem 2rem;
+      margin-bottom: 2.2rem;
+      border: 1px solid #ffffff;
+      box-shadow: 0 6px 14px rgba(0, 20, 30, 0.03);
+    }
+
+    .form-section h2 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: #1c3f52;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-section h2 i {
+      font-style: normal;
+      font-size: 1.5rem;
+    }
+
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+
+    .field {
+      flex: 1 1 180px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .field label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #426277;
+    }
+
+    .field input, .field select {
+      padding: 0.85rem 1.2rem;
+      border-radius: 2rem;
+      border: 1px solid #cbdbe8;
+      background: #fffffffa;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.2s;
+      color: #183544;
+      font-weight: 500;
+    }
+
+    .field input:focus, .field select:focus {
+      border-color: #1e7e5c;
+      box-shadow: 0 0 0 3px rgba(30, 126, 92, 0.15);
+    }
+
+    .field input::placeholder {
+      color: #9bb0c0;
+      font-weight: 400;
+    }
+
+    .add-btn {
+      background: #1b4b5e;
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 0.85rem 2rem;
+      border-radius: 2rem;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 8px 16px -4px rgba(20, 60, 80, 0.2);
+      flex: 0 0 auto;
+      letter-spacing: 0.01em;
+      margin-left: auto;
+      border: 1px solid #ffffff30;
+    }
+
+    .add-btn:hover {
+      background: #0f3848;
+      transform: scale(1.02);
+      box-shadow: 0 12px 20px -6px rgba(20, 60, 80, 0.3);
+    }
+
+    .add-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Transaction List */
+    .transactions-section {
+      background: #ffffffcc;
+      backdrop-filter: blur(8px);
+      border-radius: 2.5rem;
+      padding: 1.8rem 2rem;
+      border: 1px solid #ffffff;
+      box-shadow: 0 6px 14px rgba(0, 20, 30, 0.03);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.2rem;
+    }
+
+    .section-header h2 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #1c3f52;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .clear-btn {
+      background: transparent;
+      border: 1px solid #d0dfe9;
+      padding: 0.5rem 1.2rem;
+      border-radius: 2rem;
+      color: #4b6579;
+      font-weight: 500;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .clear-btn:hover {
+      background: #fff0f0;
+      border-color: #c09b9b;
+      color: #b13e3e;
+    }
+
+    .transaction-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      max-height: 340px;
+      overflow-y: auto;
+      padding-right: 0.3rem;
+    }
+
+    .transaction-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .transaction-list::-webkit-scrollbar-track {
+      background: #e8f0f7;
+      border-radius: 10px;
+    }
+
+    .transaction-list::-webkit-scrollbar-thumb {
+      background: #b6cfdf;
+      border-radius: 10px;
+    }
+
+    .transaction-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fffffffa;
+      padding: 1rem 1.5rem;
+      border-radius: 1.8rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      border: 1px solid #e5f0f7;
+      transition: all 0.15s;
+      animation: fadeSlide 0.25s ease;
+    }
+
+    @keyframes fadeSlide {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .transaction-item:hover {
+      border-color: #bdd7e8;
+      background: #ffffff;
+    }
+
+    .transaction-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .transaction-icon {
+      font-size: 1.6rem;
+      width: 2.4rem;
+      text-align: center;
+    }
+
+    .transaction-desc {
+      font-weight: 600;
+      color: #1e3a4b;
+      font-size: 1.05rem;
+    }
+
+    .transaction-category {
+      background: #e6f0f7;
+      padding: 0.25rem 1rem;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #2b5f7a;
+      text-transform: uppercase;
+      border: 1px solid #c9dfed;
+    }
+
+    .transaction-amount {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .amount-value {
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .amount-value.income {
+      color: #0e6b4b;
+    }
+
+    .amount-value.expense {
+      color: #b13e3e;
+    }
+
+    .delete-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      color: #8fa9bb;
+      padding: 0.2rem 0.6rem;
+      border-radius: 50%;
+      transition: all 0.15s;
+      line-height: 1;
+    }
+
+    .delete-btn:hover {
+      background: #fde7e7;
+      color: #c23b3b;
+      transform: scale(1.1);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: #89a3b5;
+      font-weight: 500;
+      background: #f7fbfe;
+      border-radius: 2rem;
+      font-size: 1.05rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      .app-container {
+        padding: 1.5rem;
+      }
+      .summary-cards {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .input-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .add-btn {
+        margin-left: 0;
+        justify-content: center;
+      }
+      .transaction-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+      }
+      .transaction-amount {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .logo h1 {
+        font-size: 1.7rem;
+      }
+    }
+
+    @media (max-width: 450px) {
+      .balance-badge .amount {
+        font-size: 1.5rem;
+      }
+      .card .info .value {
+        font-size: 1.5rem;
+      }
+      .transaction-info {
+        gap: 0.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <h1><span>💰</span> SmartExpenseTracker</h1>
+      </div>
+      <div id="authArea" style="display:flex;align-items:center;gap:.75rem;margin-left:auto;">
+        <span id="userEmail" style="font-size:.9rem;color:#426277;font-weight:600;"></span>
+        <button id="authBtn" class="clear-btn" type="button">Sign in</button>
+      </div>
+
+      <div class="balance-badge" id="balanceBadge">
+        <div class="label">Current balance</div>
+        <div class="amount" id="balanceAmount">$0.00</div>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="card income-card">
+        <div class="info">
+          <h3>Total Income</h3>
+          <div class="value" id="totalIncome">$0.00</div>
+        </div>
+        <div class="icon">📈</div>
+      </div>
+      <div class="card expense-card">
+        <div class="info">
+          <h3>Total Expenses</h3>
+          <div class="value" id="totalExpenses">$0.00</div>
+        </div>
+        <div class="icon">📉</div>
+      </div>
+    </div>
+
+    <!-- Add Transaction Form -->
+    <div class="form-section">
+      <h2><i>➕</i> Add transaction</h2>
+      <div class="input-group">
+        <div class="field">
+          <label for="descInput">Description</label>
+          <input type="text" id="descInput" placeholder="e.g. Groceries" maxlength="40">
+        </div>
+        <div class="field">
+          <label for="amountInput">Amount</label>
+          <input type="number" id="amountInput" placeholder="0.00" min="0.01" step="0.01">
+        </div>
+        <div class="field">
+          <label for="typeSelect">Type</label>
+          <select id="typeSelect">
+            <option value="income">Income</option>
+            <option value="expense" selected>Expense</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="categorySelect">Category</label>
+          <select id="categorySelect">
+            <option value="Food">🍔 Food</option>
+            <option value="Transport">🚗 Transport</option>
+            <option value="Shopping">🛍️ Shopping</option>
+            <option value="Bills">📄 Bills</option>
+            <option value="Entertainment">🎬 Entertainment</option>
+            <option value="Salary">💼 Salary</option>
+            <option value="Other">📌 Other</option>
+          </select>
+        </div>
+        <button class="add-btn" id="addBtn">
+          <span>+</span> Add
+        </button>
+      </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="transactions-section">
+      <div class="section-header">
+        <h2><i>📋</i> History</h2>
+        <button class="clear-btn" id="clearAllBtn">Clear all</button>
+      </div>
+      <div class="transaction-list" id="transactionList">
+        <!-- dynamic items inserted here -->
+        <div class="empty-state" id="emptyState">No transactions yet. Add one above 👆</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // script.js - Smart Expense Tracker logic
+
+
+    // ---------- Amazon Cognito authentication ----------
+    const COGNITO_DOMAIN = "https://ap-south-1jurva1u8n.auth.ap-south-1.amazoncognito.com";
+    const COGNITO_CLIENT_ID = "7lki66j59rnqlgkjmuuv5usl3u";
+    const REDIRECT_URI = window.location.origin + "/";
+    const API_BASE_URL = "https://awztqdvsq0.execute-api.ap-south-1.amazonaws.com";
+
+    async function apiRequest(path, options = {}) {
+      const tokens = getTokens();
+      if (!tokens?.id_token) {
+        throw new Error("Please sign in first.");
+      }
+
+      const headers = {
+        "Authorization": `Bearer ${tokens.id_token}`,
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      };
+
+      const response = await fetch(`${API_BASE_URL}${path}`, {
+        ...options,
+        headers
+      });
+
+      const text = await response.text();
+      let data = {};
+      try { data = text ? JSON.parse(text) : {}; }
+      catch { data = { error: text || "Unknown API response" }; }
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || `API request failed (${response.status})`);
+      }
+
+      return data;
+    }
+
+    const authBtn = document.getElementById("authBtn");
+    const userEmailEl = document.getElementById("userEmail");
+
+    function base64UrlEncode(bytes) {
+      let binary = "";
+      bytes.forEach(b => binary += String.fromCharCode(b));
+      return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    }
+
+    async function sha256(text) {
+      const data = new TextEncoder().encode(text);
+      return new Uint8Array(await crypto.subtle.digest("SHA-256", data));
+    }
+
+    function randomString(length = 64) {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+      const bytes = crypto.getRandomValues(new Uint8Array(length));
+      return Array.from(bytes, b => chars[b % chars.length]).join("");
+    }
+
+    async function signIn() {
+      const verifier = randomString();
+      const challenge = base64UrlEncode(await sha256(verifier));
+      sessionStorage.setItem("cognito_code_verifier", verifier);
+
+      const params = new URLSearchParams({
+        client_id: COGNITO_CLIENT_ID,
+        response_type: "code",
+        scope: "openid email",
+        redirect_uri: REDIRECT_URI,
+        code_challenge_method: "S256",
+        code_challenge: challenge
+      });
+
+      window.location.href = `${COGNITO_DOMAIN}/oauth2/authorize?${params.toString()}`;
+    }
+
+    async function exchangeCodeForTokens(code) {
+      const verifier = sessionStorage.getItem("cognito_code_verifier");
+      if (!verifier) throw new Error("Missing PKCE verifier. Please sign in again.");
+
+      const response = await fetch(`${COGNITO_DOMAIN}/oauth2/token`, {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: new URLSearchParams({
+          grant_type: "authorization_code",
+          client_id: COGNITO_CLIENT_ID,
+          code,
+          redirect_uri: REDIRECT_URI,
+          code_verifier: verifier
+        })
+      });
+
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(`Cognito token exchange failed: ${message}`);
+      }
+
+      const tokens = await response.json();
+      sessionStorage.removeItem("cognito_code_verifier");
+      sessionStorage.setItem("cognito_tokens", JSON.stringify(tokens));
+      return tokens;
+    }
+
+    function decodeJwtPayload(token) {
+      const payload = token.split(".")[1];
+      const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = normalized + "=".repeat((4 - normalized.length % 4) % 4);
+      return JSON.parse(atob(padded));
+    }
+
+    function getTokens() {
+      try {
+        return JSON.parse(sessionStorage.getItem("cognito_tokens") || "null");
+      } catch {
+        return null;
+      }
+    }
+
+    function updateAuthUI() {
+      const tokens = getTokens();
+      if (tokens?.id_token) {
+        const claims = decodeJwtPayload(tokens.id_token);
+        userEmailEl.textContent = claims.email || claims.username || "Signed in";
+        authBtn.textContent = "Sign out";
+      } else {
+        userEmailEl.textContent = "";
+        authBtn.textContent = "Sign in";
+      }
+    }
+
+    function signOut() {
+      sessionStorage.removeItem("cognito_tokens");
+      sessionStorage.removeItem("cognito_code_verifier");
+
+      const params = new URLSearchParams({
+        client_id: COGNITO_CLIENT_ID,
+        logout_uri: REDIRECT_URI
+      });
+
+      window.location.href = `${COGNITO_DOMAIN}/logout?${params.toString()}`;
+    }
+
+    async function handleCognitoCallback() {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("code");
+      const error = params.get("error");
+
+      if (error) {
+        alert(`Cognito sign-in error: ${params.get("error_description") || error}`);
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+
+      if (code) {
+        try {
+          await exchangeCodeForTokens(code);
+          window.history.replaceState({}, document.title, window.location.pathname);
+          updateAuthUI();
+          window.dispatchEvent(new Event("cognito-auth-ready"));
+        } catch (err) {
+          console.error(err);
+          alert(err.message);
+        }
+      }
+    }
+
+    authBtn.addEventListener("click", () => {
+      if (getTokens()) signOut();
+      else signIn();
+    });
+
+    handleCognitoCallback();
+    if (getTokens()) {
+      window.dispatchEvent(new Event("cognito-auth-ready"));
+    }
+
+    (function() {
+      // ---------- State ----------
+      let transactions = [];
+
+      // DOM elements
+      const balanceAmountEl = document.getElementById('balanceAmount');
+      const totalIncomeEl = document.getElementById('totalIncome');
+      const totalExpensesEl = document.getElementById('totalExpenses');
+      const transactionListEl = document.getElementById('transactionList');
+      const emptyStateEl = document.getElementById('emptyState');
+      const descInput = document.getElementById('descInput');
+      const amountInput = document.getElementById('amountInput');
+      const typeSelect = document.getElementById('typeSelect');
+      const categorySelect = document.getElementById('categorySelect');
+      const addBtn = document.getElementById('addBtn');
+      const clearAllBtn = document.getElementById('clearAllBtn');
+
+      // ---------- Helper functions ----------
+      function formatCurrency(value) {
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(value);
+      }
+
+      // Update UI: balance, totals, and transaction list
+      function updateUI() {
+        // Calculate totals
+        const totalIncome = transactions
+          .filter(t => t.type === 'income')
+          .reduce((sum, t) => sum + t.amount, 0);
+        const totalExpense = transactions
+          .filter(t => t.type === 'expense')
+          .reduce((sum, t) => sum + t.amount, 0);
+        const balance = totalIncome - totalExpense;
+
+        // Update summary
+        totalIncomeEl.textContent = formatCurrency(totalIncome);
+        totalExpensesEl.textContent = formatCurrency(totalExpense);
+        balanceAmountEl.textContent = formatCurrency(balance);
+
+        // Update balance badge color
+        const balanceBadge = document.getElementById('balanceBadge');
+        const amountDiv = balanceBadge.querySelector('.amount');
+        amountDiv.classList.remove('positive', 'negative');
+        if (balance > 0) amountDiv.classList.add('positive');
+        else if (balance < 0) amountDiv.classList.add('negative');
+
+        // Render transaction list
+        renderTransactionList();
+      }
+
+      // Render list of transactions with delete buttons
+      function renderTransactionList() {
+        // Clear container (keep empty state if no transactions)
+        if (transactions.length === 0) {
+          transactionListEl.innerHTML = '<div class="empty-state" id="emptyState">No transactions yet. Add one above 👆</div>';
+          return;
+        }
+
+        // Build HTML for each transaction
+        const itemsHtml = transactions.map((t, index) => {
+          // Use a unique id if available; we'll use index as fallback but we need stability.
+          // We'll attach data-index attribute and use event delegation.
+          const sign = t.type === 'income' ? '+' : '-';
+          const amountClass = t.type === 'income' ? 'income' : 'expense';
+          const icon = getCategoryIcon(t.category);
+          const categoryLabel = t.category || 'Other';
+
+          return `
+            <div class="transaction-item" data-index="${index}">
+              <div class="transaction-info">
+                <div class="transaction-icon">${icon}</div>
+                <div class="transaction-desc">${escapeHtml(t.description)}</div>
+                <div class="transaction-category">${escapeHtml(categoryLabel)}</div>
+              </div>
+              <div class="transaction-amount">
+                <span class="amount-value ${amountClass}">${sign}${formatCurrency(t.amount)}</span>
+                <button class="delete-btn" data-index="${index}" title="Delete transaction">✕</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        transactionListEl.innerHTML = itemsHtml;
+      }
+
+      // Get icon based on category
+      function getCategoryIcon(category) {
+        const icons = {
+          'Food': '🍔',
+          'Transport': '🚗',
+          'Shopping': '🛍️',
+          'Bills': '📄',
+          'Entertainment': '🎬',
+          'Salary': '💼',
+          'Other': '📌'
+        };
+        return icons[category] || '📌';
+      }
+
+      // Basic HTML escaping for security
+      function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // Add a new transaction from form inputs
+      async function addTransaction() {
+        const description = descInput.value.trim();
+        const amountRaw = amountInput.value.trim();
+        const type = typeSelect.value;
+        const category = categorySelect.value;
+
+        if (!description) {
+          alert('Please enter a description.');
+          descInput.focus();
+          return;
+        }
+
+        if (!amountRaw) {
+          alert('Please enter an amount.');
+          amountInput.focus();
+          return;
+        }
+
+        const amount = parseFloat(amountRaw);
+        if (isNaN(amount) || amount <= 0) {
+          alert('Please enter a valid positive amount.');
+          amountInput.value = '';
+          amountInput.focus();
+          return;
+        }
+
+        addBtn.disabled = true;
+        try {
+          await apiRequest('/transactions', {
+            method: 'POST',
+            body: JSON.stringify({
+              description,
+              amount,
+              type,
+              category
+            })
+          });
+
+          descInput.value = '';
+          amountInput.value = '';
+          descInput.focus();
+          await loadTransactions();
+        } catch (error) {
+          console.error(error);
+          alert(`Could not save transaction: ${error.message}`);
+        } finally {
+          addBtn.disabled = false;
+        }
+      }
+
+      // Load transactions from DynamoDB through API Gateway
+      async function loadTransactions() {
+        if (!getTokens()?.id_token) {
+          transactions = [];
+          updateUI();
+          return;
+        }
+
+        try {
+          const data = await apiRequest('/transactions');
+          transactions = (data.transactions || []).map(t => ({
+            ...t,
+            amount: Number(t.amount)
+          }));
+          updateUI();
+        } catch (error) {
+          console.error(error);
+          alert(`Could not load transactions: ${error.message}`);
+        }
+      }
+
+      // Delete transaction by its DynamoDB transactionId
+      async function deleteTransactionByIndex(index) {
+        if (index < 0 || index >= transactions.length) return;
+
+        const transaction = transactions[index];
+        try {
+          await apiRequest(`/transactions/${encodeURIComponent(transaction.transactionId)}`, {
+            method: 'DELETE'
+          });
+          await loadTransactions();
+        } catch (error) {
+          console.error(error);
+          alert(`Could not delete transaction: ${error.message}`);
+        }
+      }
+
+      // Clear all transactions by deleting the user's transactions one by one
+      async function clearAllTransactions() {
+        if (transactions.length === 0) return;
+        if (!confirm('Are you sure you want to delete all transactions?')) return;
+
+        clearAllBtn.disabled = true;
+        try {
+          for (const transaction of [...transactions]) {
+            await apiRequest(`/transactions/${encodeURIComponent(transaction.transactionId)}`, {
+              method: 'DELETE'
+            });
+          }
+          await loadTransactions();
+        } catch (error) {
+          console.error(error);
+          alert(`Could not clear all transactions: ${error.message}`);
+        } finally {
+          clearAllBtn.disabled = false;
+        }
+      }
+
+      // ---------- Event Listeners ----------
+
+      // Add transaction on button click
+      addBtn.addEventListener('click', addTransaction);
+
+      // Also allow Enter key in inputs to trigger add (but not in selects)
+      descInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addTransaction();
+        }
+      });
+      amountInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addTransaction();
+        }
+      });
+
+      // Clear all button
+      clearAllBtn.addEventListener('click', clearAllTransactions);
+
+      // Event delegation for delete buttons (and also for potential future)
+      transactionListEl.addEventListener('click', (e) => {
+        const deleteBtn = e.target.closest('.delete-btn');
+        if (!deleteBtn) return;
+        const index = deleteBtn.dataset.index;
+        if (index !== undefined) {
+          deleteTransactionByIndex(parseInt(index, 10));
+        }
+      });
+
+      // ---------- Initial rendering ----------
+      updateUI();
+      updateAuthUI();
+      window.addEventListener("cognito-auth-ready", loadTransactions);
+      if (getTokens()?.id_token) {
+        loadTransactions();
+      }
+
+      // Optional: seed with demo data? Not needed, but we can add a couple of examples to show the UI.
+      // Since the user just asked for code, maybe it's nice to have a couple of sample transactions?
+      // But it might interfere. I'll keep it clean — but actually a small demo improves first impression.
+      // Let's add two sample transactions after a tiny delay? No, I'll leave it empty to be fully clean.
+      // However, for better UX in the preview, I'll pre-populate with 2 items so it doesn't look empty.
+      // The user can always clear. But they might not want pre-filled data. 
+      // I'll keep it empty — the empty state message is friendly.
+      // Actually, to show how it works, let's add a couple of demo transactions (user can clear them).
+      // It's easier to see the layout. I'll add them with a small delay.
+      // But the instruction didn't specify, so I'll respect and keep it empty.
+      // But I'll add a tiny optional demo to make the preview look better. 
+      // I'll do it with a flag: if you don't want, just comment out the demo section.
+      
+      // Small demo (optional) — uncomment if you want initial data.
+      // I'll include it because it shows the UI nicely, but keep it minimal and removable.
+      
+      // (function addDemoData() {
+      //   transactions.push(
+      //     { id: 1, description: 'Monthly salary', amount: 3200, type: 'income', category: 'Salary' },
+      //     { id: 2, description: 'Grocery shopping', amount: 124.50, type: 'expense', category: 'Food' },
+      //     { id: 3, description: 'Bus pass', amount: 45, type: 'expense', category: 'Transport' }
+      //   );
+      //   updateUI();
+      // })();
+      
+      // Actually I'll not include demo data to keep it exactly as requested: blank slate.
+      // But I'll add a tiny comment: you can add demo by uncommenting.
+      // I'll just leave it empty. The empty state is fine.
+
+      // Expose for debugging (optional)
+      window.transactions = transactions; // not required, but handy
+    })();
+  </script>
+</body>
+</html>
